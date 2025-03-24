@@ -1,6 +1,6 @@
 import React, { useState, useContext } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import axios from "../config/axios.jsx";
+import axios from "../config/axios";
 import { UserContext } from '../context/user.context.jsx'
 
 const Login = () => {
@@ -28,6 +28,7 @@ const Login = () => {
         setUser(res.data.user);
 
         navigate("/");
+        navigate(0);
       })
       .catch((err) => {
         console.log(err.response.data);

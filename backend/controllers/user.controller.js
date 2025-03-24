@@ -50,12 +50,12 @@ export const loginController = async (req, res) => {
 
     const token = await user.generateJWT();
 
-    res.cookie('jwt', token, {
+    res.cookie("jwt", token, {
       httpOnly: true,
       secure: false,
-      sameSite: 'none',
-      maxAge:  24 * 60 * 60 * 1000,
-      path: '/', 
+      sameSite: "none",
+      maxAge: 24 * 60 * 60 * 1000,
+      path: "/",
     });
 
     delete user._doc.password;
@@ -82,8 +82,8 @@ export const logoutController = async (req, res) => {
 
     res.clearCookie("jwt", {
       httpOnly: true,
-      secure: true, 
-      sameSite: "strict", 
+      secure: true,
+      sameSite: "strict",
     });
 
     // Send a success response
@@ -91,5 +91,44 @@ export const logoutController = async (req, res) => {
   } catch (error) {
     console.error("Error during logout:", error);
     res.status(500).json({ error: "Internal server error" });
+  }
+};
+
+export const getAllUsersController = async (req, res) => {
+  const errors = validationResult(req);
+
+  if (!errors.isEmpty()) {
+    return res.status(400).json({ errors: errors.array() });
+  }
+
+  try {
+    const loggedInUser = await User.findOne({ email: req.user.email });
+    const userId = loggedInUser._id;
+
+    const users = await User.find({
+      _id: { $ne: userId },
+    });
+    res.status(200).json(users);
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
+};
+
+export const getUserById = async (req, res) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(400).json({ errors: errors.array() });
+  }
+
+  try {
+    const {userId} = req.params;
+    const user = await User.findById(userId);
+
+    if(!user) throw new Error("User not found")
+    delete user._doc.password;
+
+    res.status(200).json({ user: user });
+  } catch (error) {
+    res.status(400).json({ error: error.message });
   }
 };
