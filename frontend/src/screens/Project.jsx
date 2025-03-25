@@ -1,27 +1,108 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useRef, useState } from "react";
 import { Router, useParams } from "react-router";
 import axios from "../config/axios";
 import CollaborationUser from "../components/CollaborationUser.jsx";
 import MemberUser from "../components/MemberUser.jsx";
+import * as socket from "../config/socket.js";
+import { UserContext } from "../context/user.context.jsx";
 
 const Project = () => {
+  const { user, setUser } = useContext(UserContext);
   const [myMessage, setMyMessage] = useState("");
   const [project, setProject] = useState(null);
   const [isSidePanelOpen, setIsSidePanelOpen] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [allUsers, setAllUsers] = useState([]);
   const [selectedUsers, setSelectedUsers] = useState([]);
+  const messageBox = useRef();
 
   const params = useParams();
 
   useEffect(() => {
+    if (!user) {
+      async function getUser() {
+        try {
+          const response = await axios.get(`/users/profile`);
+          if (!response) navigate("/register");
+          setUser(response.data.user);
+        } catch (error) {
+          console.log(error);
+        }
+      }
+      getUser();
+    }
+  }, []);
+
+  useEffect(() => {
+    socket.initializeSocket(params.id);
+    socket.receiveMessage("project-message", (data) => {
+      appendIncomingMessage(data);
+    });
     axios
       .get(`/project/getProject/${params.id}`)
       .then((res) => setProject(res.data))
       .catch((err) => console.error(err));
   }, []);
 
-  const sendMessage = () => {
+  const appendIncomingMessage = (messageObject) => {
+    const message = document.createElement("div");
+    message.classList.add(
+      "max-w-80",
+      "flex",
+      "flex-col",
+      "w-fit",
+      "bg-[#c4c1c1]",
+      "text-wrap",
+      "break-words",
+      "px-3",
+      "py-2",
+      "rounded-lg"
+    );
+    message.innerHTML = `
+      <small class="opacity-70">${messageObject.sender.email}</small>
+      <p class="text-base">${messageObject.message}</p>
+    `;
+
+    messageBox.current.prepend(message);
+    messageBox.current.scrollTop = messageBox.current.scrollHeight;
+  };
+
+  const appendOutgoingMessage = (messageObject) => {
+    const message = document.createElement("div");
+    message.classList.add(
+      "max-w-80",
+      "flex",
+      "flex-col",
+      "w-fit",
+      "text-wrap",
+      "break-words",
+      "bg-[#dcf8c6]",
+      "px-3",
+      "py-2",
+      "rounded-lg",
+      "ml-auto"
+    );
+    message.innerHTML = `
+      <small class="opacity-70">${messageObject.sender.email}</small>
+      <p class="text-base">${messageObject.message}</p>
+    `;
+
+    messageBox.current.prepend(message);
+    messageBox.current.scrollTop = messageBox.current.scrollHeight;
+  };
+
+  const sendMessage = (e) => {
+    e.preventDefault();
+    socket.sendMessage("project-message", {
+      message: myMessage,
+      sender: user,
+    });
+
+    appendOutgoingMessage({
+      message: myMessage,
+      sender: user,
+    });
+
     setMyMessage("");
   };
 
@@ -33,29 +114,33 @@ const Project = () => {
     try {
       const response = await axios.get("/users/getAllUsers");
       const users = response.data;
-      const usersNotInProject = users.filter(user =>!project.users.includes(user._id));
+      const usersNotInProject = users.filter(
+        (user) => !project.users.includes(user._id)
+      );
       setAllUsers(usersNotInProject);
-
     } catch (error) {
       console.error(error);
     }
   };
 
   const addUsersToProject = async () => {
-      try {
-        const updatedProject = await axios.put('/project/addUser', {projectId: project._id, users: selectedUsers});
-        setProject(updatedProject.data);
-        setSelectedUsers([]);
-        setIsModalOpen(false)
-      } catch (error) {
-        console.log(error);
-      }
+    try {
+      const updatedProject = await axios.put("/project/addUser", {
+        projectId: project._id,
+        users: selectedUsers,
+      });
+      setProject(updatedProject.data);
+      setSelectedUsers([]);
+      setIsModalOpen(false);
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   return (
     <main className="h-screen w-screen flex">
-      <section className="left h-full flex-col flex min-w-100 w-[30%] bg-[#075e54]">
-        <header className="flex justify-between items-center p-4 w-full bg-[#128c7e] shadow-xl">
+      <section className="left h-full flex-col flex min-w-100 w-[30%] bg-[#075e54] relative">
+        <header className="flex justify-between items-center p-4 w-full bg-[#128c7e] shadow-xl top-0 absolute z-10">
           <h1 className="text-[#ece5dd] text-2xl">
             {project?.name[0].toUpperCase() + project?.name.substring(1)}
           </h1>
@@ -80,21 +165,16 @@ const Project = () => {
           </button>
         </header>
 
-        <div className="conversation-area flex flex-grow flex-col">
-          <div className="message-box flex-grow flex flex-col justify-end px-2 pb-4 gap-4">
-            <div className="incomingMessage max-w-80 flex flex-col w-fit bg-[#c4c1c1] px-3 py-2 rounded-lg">
-              <small className="opacity-70">test@gmail.com</small>
-              <p className="text-base">Lorem ipsum dolor sit amet.</p>
-            </div>
-            <div className="outgoingMessage max-w-80 flex flex-col w-fit bg-[#dcf8c6] px-3 py-2 rounded-lg ml-auto">
-              <small className="opacity-70">test@gmail.com</small>
-              <p className="text-base">
-                Lorem ipsum dolor sit amet.Lorem ipsum dolor sit ametLorem ipsum
-                dolor sit amet
-              </p>
-            </div>
+        <div className="conversation-area flex flex-grow flex-col absolute top-0 pt-23 pb-16 h-full w-full">
+          <div
+            ref={messageBox}
+            className="message-box h-full flex-grow flex overflow-y-auto scroll-smooth flex-col-reverse px-4 py-4 gap-4"
+          >
           </div>
-          <div className="input-box flex gap-2 justify-center items-center mb-3 px-2 h-12">
+          <form
+            onSubmit={sendMessage}
+            className="input-box absolute bottom-0 w-full flex gap-2 justify-center items-center mb-3 px-4 h-12"
+          >
             <input
               value={myMessage}
               onChange={(e) => setMyMessage(e.target.value)}
@@ -103,7 +183,8 @@ const Project = () => {
               placeholder="Write your message here"
             />
             <button
-              onClick={sendMessage}
+              type="submit"
+              // onClick={sendMessage}
               className="bg-[#25D366] py-3 px-3 flex items-center justify-center rounded-full cursor-pointer hover:scale-105 active:scale-90 transition-all"
             >
               <svg
@@ -121,12 +202,12 @@ const Project = () => {
                 />
               </svg>
             </button>
-          </div>
+          </form>
         </div>
 
         <div
           className={
-            "side-panel overflow-hidden flex flex-col h-full min-w-100 w-[30%] absolute top-0 duration-700 bg-red-400 transition-all ease-in-out " +
+            "side-panel overflow-hidden flex w-full flex-col h-full z-20 absolute top-0 duration-700 transition-all ease-in-out " +
             (!isSidePanelOpen ? "left-[-100%]" : "left-0")
           }
         >
@@ -176,8 +257,10 @@ const Project = () => {
             </button>
           </header>
           <div className="users flex-grow overflow-y-scroll scroll-smooth flex flex-col gap-2 pt-4 bg-[#c4c1c1]">
-            {project?.users.length > 0 && project.users.map(userId => <MemberUser key={userId} userId={userId}/>)}
-            
+            {project?.users.length > 0 &&
+              project.users.map((userId) => (
+                <MemberUser key={userId} userId={userId} />
+              ))}
           </div>
         </div>
       </section>

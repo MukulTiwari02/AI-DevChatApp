@@ -7,6 +7,7 @@
 
 /* Track */
 ::-webkit-scrollbar-track {
+    visibility: hidden;
     background: #c4c1c1;
     border-radius: 5px;
 }

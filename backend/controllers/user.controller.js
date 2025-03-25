@@ -67,7 +67,8 @@ export const loginController = async (req, res) => {
 };
 
 export const profileController = async (req, res) => {
-  const user = req.user;
+  let user = req.user;
+  user = await User.findOne({email: user.email})
   res.status(200).json({ user: user });
 };
 
