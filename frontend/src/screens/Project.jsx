@@ -84,13 +84,16 @@ const Project = () => {
 
   const sendMessage = (e) => {
     e.preventDefault();
+    if (myMessage === "") return;
+    const message = myMessage.replace(/\n/g, "<br />");
+
     socket.sendMessage("project-message", {
-      message: myMessage,
+      message: message,
       sender: user,
     });
 
     appendOutgoingMessage({
-      message: myMessage,
+      message: message,
       sender: user,
     });
 
@@ -128,6 +131,25 @@ const Project = () => {
     }
   };
 
+  const handleKeyDown = (e) => {
+    if (e.key === "Enter" && !e.shiftKey) sendMessage(e);
+
+    if (e.key === "Enter" && e.shiftKey) {
+      e.preventDefault();
+
+      const cursorPosition = e.target.selectionStart;
+      const newText =
+        myMessage.slice(0, cursorPosition) +
+        "\n" +
+        myMessage.slice(cursorPosition);
+      setMyMessage(newText);
+
+      e.target.scrollTop = e.target.scrollHeight;
+
+      e.target.selectionStart = e.target.selectionEnd = cursorPosition + 1;
+    }
+  };
+
   return (
     <main className="h-screen w-screen flex">
       <section className="left h-full flex-col flex min-w-100 w-[30%] bg-[#075e54] relative">
@@ -158,46 +180,57 @@ const Project = () => {
 
         <div className="conversation-area flex flex-grow flex-col absolute top-0 pt-23 pb-16 h-full w-full">
           <div className="message-box h-full flex-grow flex overflow-y-auto scroll-smooth flex-col-reverse px-4 py-4 gap-4">
-            {messages.map((message, index) => (
-              <div
-                key={index}
-                className={
-                  message.type === "incoming"
-                    ? message.sender._id === "AI"
-                      ? "max-w-100 bg-[#054640] text-[#ece5dd] px-3 py-2 rounded-lg"
-                      : "max-w-80 flex flex-col w-fit text-wrap break-words bg-[#c4c1c1] px-3 py-2 rounded-lg"
-                    : "max-w-80 flex flex-col w-fit text-wrap break-words bg-[#dcf8c6] px-3 py-2 rounded-lg ml-auto"
-                }
-              >
-                <small className="opacity-70">{message.sender.email}</small>
-                <p className="text-base">
-                  {message.type === "incoming" &&
-                  message.sender._id === "AI" ? (
-                    <Markdown
-                      children={message.message}
-                      options={{
-                        overrides: {
-                          code: SyntaxHighlightedCode,
-                        },
-                      }}
-                    />
-                  ) : (
-                    message.message
-                  )}
-                </p>
-              </div>
-            ))}
+            {messages.map((message, index) => {
+              return (
+                <div
+                  key={index}
+                  className={
+                    message.type === "incoming"
+                      ? message.sender._id === "AI"
+                        ? "max-w-100 bg-[#054640] text-[#ece5dd] px-3 py-2 rounded-lg"
+                        : "max-w-80 flex flex-col w-fit text-wrap break-words bg-[#c4c1c1] px-3 py-2 rounded-lg"
+                      : "max-w-80 flex flex-col w-fit text-wrap break-words bg-[#dcf8c6] px-3 py-2 rounded-lg ml-auto"
+                  }
+                >
+                  <small className="opacity-70">{message.sender.email}</small>
+                  <p className="text-base">
+                    {message.type === "incoming" &&
+                    message.sender._id === "AI" ? (
+                      <Markdown
+                        children={message.message}
+                        options={{
+                          overrides: {
+                            code: SyntaxHighlightedCode,
+                          },
+                        }}
+                      />
+                    ) : (
+                      <span
+                        dangerouslySetInnerHTML={{
+                          __html: message.message
+                            .replace(/^\s*<br\s*\/?>\s*/g, "") // Remove <br> tags from the start
+                            .replace(/\s*<br\s*\/?>\s*$/g, "") // Remove <br> tags from the end
+                            .replace(/(<br\s*\/?>\s*)+/g, "<br />") // Collapse multiple <br> tags into one
+                            .trim(), // Trim leading/trailing spaces
+                        }}
+                      />
+                    )}
+                  </p>
+                </div>
+              );
+            })}
           </div>
           <form
             onSubmit={sendMessage}
             className="input-box absolute bottom-0 w-full flex gap-2 justify-center items-center mb-3 px-4 h-12"
           >
-            <input
+            <textarea
               value={myMessage}
               onChange={(e) => setMyMessage(e.target.value)}
-              type="text"
-              className="py-2 h-full px-4 flex-10/12 bg-[#ece5dd] outline-0 border-0 rounded-lg"
-              placeholder="Write your message here"
+              onKeyDown={handleKeyDown}
+              rows={1}
+              className="py-3 px-4 h-full flex items-center justify-center flex-10/12 bg-[#ece5dd] outline-0 border-0 rounded-lg resize-none"
+              placeholder="Use @ai to give prompt to AI."
             />
             <button
               type="submit"
@@ -205,17 +238,11 @@ const Project = () => {
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
-                fill="none"
                 viewBox="0 0 24 24"
-                strokeWidth={1.5}
-                stroke="#ece5dd"
-                className="size-8 translate-x-0.5"
+                fill="#ece5dd"
+                className="size-7 translate-x-0.5"
               >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M6 12 3.269 3.125A59.769 59.769 0 to 1 21.485 12 59.768 59.768 0 0 1 3.27 20.875L5.999 12Zm0 0h7.5"
-                />
+                <path d="M3.478 2.404a.75.75 0 0 0-.926.941l2.432 7.905H13.5a.75.75 0 0 1 0 1.5H4.984l-2.432 7.905a.75.75 0 0 0 .926.94 60.519 60.519 0 0 0 18.445-8.986.75.75 0 0 0 0-1.218A60.517 60.517 0 0 0 3.478 2.404Z" />
               </svg>
             </button>
           </form>
