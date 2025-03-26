@@ -1,10 +1,26 @@
-import React, { useContext, useEffect, useRef, useState } from "react";
-import { Router, useParams } from "react-router";
+import React, { useContext, useEffect, useState } from "react";
+import { useParams } from "react-router";
 import axios from "../config/axios";
 import CollaborationUser from "../components/CollaborationUser.jsx";
 import MemberUser from "../components/MemberUser.jsx";
 import * as socket from "../config/socket.js";
 import { UserContext } from "../context/user.context.jsx";
+import Markdown from "markdown-to-jsx";
+
+function SyntaxHighlightedCode(props) {
+  const ref = React.useRef(null);
+
+  React.useEffect(() => {
+    if (ref.current && props.className?.includes("lang-") && window.hljs) {
+      window.hljs.highlightElement(ref.current);
+
+      // hljs won't reprocess the element unless this attribute is removed
+      ref.current.removeAttribute("data-highlighted");
+    }
+  }, [props.className, props.children]);
+
+  return <code {...props} ref={ref} />;
+}
 
 const Project = () => {
   const { user, setUser } = useContext(UserContext);
@@ -14,7 +30,7 @@ const Project = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [allUsers, setAllUsers] = useState([]);
   const [selectedUsers, setSelectedUsers] = useState([]);
-  const messageBox = useRef();
+  const [messages, setMessages] = useState([]);
 
   const params = useParams();
 
@@ -45,50 +61,25 @@ const Project = () => {
   }, []);
 
   const appendIncomingMessage = (messageObject) => {
-    const message = document.createElement("div");
-    message.classList.add(
-      "max-w-80",
-      "flex",
-      "flex-col",
-      "w-fit",
-      "bg-[#c4c1c1]",
-      "text-wrap",
-      "break-words",
-      "px-3",
-      "py-2",
-      "rounded-lg"
-    );
-    message.innerHTML = `
-      <small class="opacity-70">${messageObject.sender.email}</small>
-      <p class="text-base">${messageObject.message}</p>
-    `;
-
-    messageBox.current.prepend(message);
-    messageBox.current.scrollTop = messageBox.current.scrollHeight;
+    setMessages((prevMessages) => [
+      {
+        type: "incoming",
+        message: messageObject.message,
+        sender: messageObject.sender,
+      },
+      ...prevMessages,
+    ]);
   };
 
   const appendOutgoingMessage = (messageObject) => {
-    const message = document.createElement("div");
-    message.classList.add(
-      "max-w-80",
-      "flex",
-      "flex-col",
-      "w-fit",
-      "text-wrap",
-      "break-words",
-      "bg-[#dcf8c6]",
-      "px-3",
-      "py-2",
-      "rounded-lg",
-      "ml-auto"
-    );
-    message.innerHTML = `
-      <small class="opacity-70">${messageObject.sender.email}</small>
-      <p class="text-base">${messageObject.message}</p>
-    `;
-
-    messageBox.current.prepend(message);
-    messageBox.current.scrollTop = messageBox.current.scrollHeight;
+    setMessages((prevMessages) => [
+      {
+        type: "outgoing",
+        message: messageObject.message,
+        sender: messageObject.sender,
+      },
+      ...prevMessages,
+    ]);
   };
 
   const sendMessage = (e) => {
@@ -166,10 +157,36 @@ const Project = () => {
         </header>
 
         <div className="conversation-area flex flex-grow flex-col absolute top-0 pt-23 pb-16 h-full w-full">
-          <div
-            ref={messageBox}
-            className="message-box h-full flex-grow flex overflow-y-auto scroll-smooth flex-col-reverse px-4 py-4 gap-4"
-          >
+          <div className="message-box h-full flex-grow flex overflow-y-auto scroll-smooth flex-col-reverse px-4 py-4 gap-4">
+            {messages.map((message, index) => (
+              <div
+                key={index}
+                className={
+                  message.type === "incoming"
+                    ? message.sender._id === "AI"
+                      ? "max-w-100 bg-[#054640] text-[#ece5dd] px-3 py-2 rounded-lg"
+                      : "max-w-80 flex flex-col w-fit text-wrap break-words bg-[#c4c1c1] px-3 py-2 rounded-lg"
+                    : "max-w-80 flex flex-col w-fit text-wrap break-words bg-[#dcf8c6] px-3 py-2 rounded-lg ml-auto"
+                }
+              >
+                <small className="opacity-70">{message.sender.email}</small>
+                <p className="text-base">
+                  {message.type === "incoming" &&
+                  message.sender._id === "AI" ? (
+                    <Markdown
+                      children={message.message}
+                      options={{
+                        overrides: {
+                          code: SyntaxHighlightedCode,
+                        },
+                      }}
+                    />
+                  ) : (
+                    message.message
+                  )}
+                </p>
+              </div>
+            ))}
           </div>
           <form
             onSubmit={sendMessage}
@@ -184,7 +201,6 @@ const Project = () => {
             />
             <button
               type="submit"
-              // onClick={sendMessage}
               className="bg-[#25D366] py-3 px-3 flex items-center justify-center rounded-full cursor-pointer hover:scale-105 active:scale-90 transition-all"
             >
               <svg
@@ -198,7 +214,7 @@ const Project = () => {
                 <path
                   strokeLinecap="round"
                   strokeLinejoin="round"
-                  d="M6 12 3.269 3.125A59.769 59.769 0 0 1 21.485 12 59.768 59.768 0 0 1 3.27 20.875L5.999 12Zm0 0h7.5"
+                  d="M6 12 3.269 3.125A59.769 59.769 0 to 1 21.485 12 59.768 59.768 0 0 1 3.27 20.875L5.999 12Zm0 0h7.5"
                 />
               </svg>
             </button>
@@ -266,7 +282,7 @@ const Project = () => {
       </section>
 
       {isModalOpen && (
-        <div className="fixed z-10 inset-0 overflow-y-hidden">
+        <div className="fixed z-20 inset-0 overflow-y-hidden">
           <div className="flex flex-col items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
             <div
               className="fixed inset-0 transition-opacity"

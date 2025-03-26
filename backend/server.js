@@ -3,6 +3,7 @@ import app from "./app.js";
 import { Server } from "socket.io";
 import jwt from "jsonwebtoken";
 import Project from "./models/project.model.js";
+import { generateResult } from "./services/ai.service.js";
 
 const server = http.createServer(app);
 
@@ -42,8 +43,27 @@ io.on("connection", (socket) => {
 
   socket.join(socket.roomId);
 
-  socket.on("project-message", (data) => {
+  socket.on("project-message", async (data) => {
     socket.broadcast.to(socket.roomId).emit("project-message", data);
+
+    const message = data.message;
+    const isAiPrompt =
+      message.includes("@ai") ||
+      message.includes("@Ai") ||
+      message.includes("@AI");
+
+    if (isAiPrompt) {
+      const prompt = message
+        .replace("@ai", "")
+        .replace("@AI", "")
+        .replace("@Ai", "")
+        .trim();
+      const aiResponse = await generateResult(prompt);
+      io.to(socket.roomId).emit("project-message", {
+        message: aiResponse,
+        sender: { _id: "AI", email: "AI" },
+      });
+    }
   });
 
   socket.on("disconnect", () => {
