@@ -2,10 +2,12 @@ import React, { useContext, useEffect, useState } from "react";
 import { useParams } from "react-router";
 import axios from "../config/axios";
 import CollaborationUser from "../components/CollaborationUser.jsx";
+import FileTreeElement from "../components/FileTreeElement.jsx";
 import MemberUser from "../components/MemberUser.jsx";
 import * as socket from "../config/socket.js";
 import { UserContext } from "../context/user.context.jsx";
 import Markdown from "markdown-to-jsx";
+import hljs from "highlight.js";
 
 function SyntaxHighlightedCode(props) {
   const ref = React.useRef(null);
@@ -31,6 +33,9 @@ const Project = () => {
   const [allUsers, setAllUsers] = useState([]);
   const [selectedUsers, setSelectedUsers] = useState([]);
   const [messages, setMessages] = useState([]);
+  const [fileTree, setFileTree] = useState({});
+  const [currentFile, setCurrentFile] = useState(null);
+  const [openFiles, setOpenFiles] = useState([]);
 
   const params = useParams();
 
@@ -52,6 +57,12 @@ const Project = () => {
   useEffect(() => {
     socket.initializeSocket(params.id);
     socket.receiveMessage("project-message", (data) => {
+      const message = JSON.parse(data.message);
+      if (message.fileTree) {
+        setFileTree(message.fileTree);
+        setOpenFiles([]);
+        setCurrentFile(null);
+      }
       appendIncomingMessage(data);
     });
     axios
@@ -150,6 +161,20 @@ const Project = () => {
     }
   };
 
+  const renderAiMessageTextToChat = (message) => {
+    const messageObject = JSON.parse(message);
+    return (
+      <Markdown
+        children={messageObject.text}
+        options={{
+          overrides: {
+            code: SyntaxHighlightedCode,
+          },
+        }}
+      />
+    );
+  };
+
   return (
     <main className="h-screen w-screen flex">
       <section className="left h-full flex-col flex min-w-100 w-[30%] bg-[#075e54] relative">
@@ -196,14 +221,7 @@ const Project = () => {
                   <p className="text-base">
                     {message.type === "incoming" &&
                     message.sender._id === "AI" ? (
-                      <Markdown
-                        children={message.message}
-                        options={{
-                          overrides: {
-                            code: SyntaxHighlightedCode,
-                          },
-                        }}
-                      />
+                      renderAiMessageTextToChat(message.message)
                     ) : (
                       <span
                         dangerouslySetInnerHTML={{
@@ -304,6 +322,112 @@ const Project = () => {
               project.users.map((userId) => (
                 <MemberUser key={userId} userId={userId} />
               ))}
+          </div>
+        </div>
+      </section>
+
+      <section className="right flex flex-grow h-full">
+        <div className="explorer h-full bg-[#054640] min-w-56 w-2/12">
+          <div className="file-tree flex flex-col overflow-hidden">
+            {Object.keys(fileTree).map((fileName) => {
+              return (
+                <FileTreeElement
+                  key={fileName}
+                  fileName={fileName}
+                  setCurrentFile={setCurrentFile}
+                  setOpenFiles={setOpenFiles}
+                />
+              );
+            })}
+          </div>
+        </div>
+        <div className="code-editor flex flex-col flex-grow h-full bg-[#0b2926]">
+          <div className="top flex justify-between w-full">
+            <div className="files flex">
+              {openFiles.map((file, index) => (
+                <button
+                  key={index}
+                  className={`open-file cursor-pointer transition-all p-3 px-4 flex justify-center items-center w-fit gap-2 ${
+                    currentFile === file
+                      ? "scale-105 ml-0.5 bg-[#c2fcf3]"
+                      : " bg-[#128c7e]"
+                  }`}
+                >
+                  <p
+                    onClick={() => setCurrentFile(file)}
+                    className="font-semibold text-lg w-full h-full"
+                  >
+                    {file}
+                  </p>
+                  {currentFile === file && (
+                    <span
+                      onClick={() => {
+                        const updatedFiles = [...openFiles];
+                        const indexOfFile = updatedFiles.indexOf(file);
+                        if (indexOfFile == 0 && openFiles.length == 1)
+                          setCurrentFile(null);
+                        else if (indexOfFile == 0) setCurrentFile(openFiles[1]);
+                        else setCurrentFile(openFiles[indexOfFile - 1]);
+                        updatedFiles.splice(indexOfFile, 1);
+                        setOpenFiles(updatedFiles);
+                      }}
+                    >
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        strokeWidth={1}
+                        stroke="currentColor"
+                        className="size-4"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          d="m9.75 9.75 4.5 4.5m0-4.5-4.5 4.5M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"
+                        />
+                      </svg>
+                    </span>
+                  )}
+                </button>
+              ))}
+            </div>
+          </div>
+          <div className="bottom flex flex-grow max-w-full shrink overflow-auto">
+            {currentFile && fileTree[currentFile] && (
+              <div className="code-editor-area h-full overflow-auto flex-grow">
+                <pre className="hljs h-full">
+                  <code
+                    className="hljs h-full outline-none"
+                    contentEditable
+                    suppressContentEditableWarning
+                    spellCheck={false}
+                    onBlur={(e) => {
+                      const updatedContent = e.target.innerText;
+                      const ft = {
+                        ...fileTree,
+                        [currentFile]: {
+                          file: {
+                            contents: updatedContent,
+                          },
+                        },
+                      };
+                      setFileTree(ft);
+                    }}
+                    dangerouslySetInnerHTML={{
+                      __html: hljs.highlight(
+                        "javascript",
+                        fileTree[currentFile].file.contents
+                      ).value,
+                    }}
+                    style={{
+                      whiteSpace: "pre-wrap",
+                      paddingBottom: "25rem",
+                      counterSet: "line-numbering",
+                    }}
+                  />
+                </pre>
+              </div>
+            )}
           </div>
         </div>
       </section>

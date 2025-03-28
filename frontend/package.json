@@ -12,8 +12,10 @@
   "dependencies": {
     "@tailwindcss/postcss": "^4.0.15",
     "@tailwindcss/vite": "^4.0.15",
+    "@webcontainer/api": "^1.5.3",
     "autoprefixer": "^10.4.21",
     "axios": "^1.8.4",
+    "highlight.js": "^11.11.1",
     "markdown-to-jsx": "^7.7.4",
     "postcss": "^8.5.3",
     "react": "^19.0.0",
