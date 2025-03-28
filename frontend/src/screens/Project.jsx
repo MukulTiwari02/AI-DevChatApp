@@ -83,7 +83,8 @@ const Project = () => {
       .get(`/project/getProject/${params.id}`)
       .then((res) => {
         setProject(res.data);
-        setFileTree(res.data.fileTree);
+        if(!res.data.fileTree) setFileTree({});
+        else setFileTree(res.data.fileTree);
       })
       .catch((err) => console.error(err));
   }, []);
@@ -109,6 +110,8 @@ const Project = () => {
       ...prevMessages,
     ]);
   };
+
+  console.log(fileTree)
 
   const sendMessage = (e) => {
     e.preventDefault();
