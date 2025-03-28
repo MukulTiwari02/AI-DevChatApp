@@ -111,8 +111,6 @@ const Project = () => {
     ]);
   };
 
-  console.log(fileTree)
-
   const sendMessage = (e) => {
     e.preventDefault();
     if (myMessage === "") return;
