@@ -8,6 +8,7 @@ import * as socket from "../config/socket.js";
 import { UserContext } from "../context/user.context.jsx";
 import Markdown from "markdown-to-jsx";
 import hljs from "highlight.js";
+import GridLoader from "react-spinners/GridLoader";
 
 function SyntaxHighlightedCode(props) {
   const ref = React.useRef(null);
@@ -36,6 +37,7 @@ const Project = () => {
   const [fileTree, setFileTree] = useState({});
   const [currentFile, setCurrentFile] = useState(null);
   const [openFiles, setOpenFiles] = useState([]);
+  const [waitingForResponse, setWaitingForResponse] = useState(false);
 
   const params = useParams();
 
@@ -56,18 +58,33 @@ const Project = () => {
 
   useEffect(() => {
     socket.initializeSocket(params.id);
+
     socket.receiveMessage("project-message", (data) => {
-      const message = JSON.parse(data.message);
-      if (message.fileTree) {
-        setFileTree(message.fileTree);
-        setOpenFiles([]);
-        setCurrentFile(null);
+      if (data.sender._id === "AI") {
+        setWaitingForResponse(false);
+        try {
+          const message = JSON.parse(data.message);
+          if (message.fileTree) {
+            setFileTree(message.fileTree);
+            saveFileTree(message.fileTree);
+            setOpenFiles([]);
+            setCurrentFile(null);
+          }
+        } catch (error) {
+          console.log(error);
+          data.message = JSON.stringify({
+            text: "Unknown response format. Try again with a more detailed prompt giving details about the file structure too if possible.",
+          });
+        }
       }
       appendIncomingMessage(data);
     });
     axios
       .get(`/project/getProject/${params.id}`)
-      .then((res) => setProject(res.data))
+      .then((res) => {
+        setProject(res.data);
+        setFileTree(res.data.fileTree);
+      })
       .catch((err) => console.error(err));
   }, []);
 
@@ -97,6 +114,7 @@ const Project = () => {
     e.preventDefault();
     if (myMessage === "") return;
     const message = myMessage.replace(/\n/g, "<br />");
+    if (message.toLowerCase().includes("@ai")) setWaitingForResponse(true);
 
     socket.sendMessage("project-message", {
       message: message,
@@ -175,6 +193,18 @@ const Project = () => {
     );
   };
 
+  const saveFileTree = async (ft) => {
+    try {
+      const updatedProject = await axios.put("/project/update-fileTree", {
+        projectId: params.id,
+        fileTree: ft,
+      });
+      setProject(updatedProject.data);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   return (
     <main className="h-screen w-screen flex">
       <section className="left h-full flex-col flex min-w-100 w-[30%] bg-[#075e54] relative">
@@ -205,6 +235,14 @@ const Project = () => {
 
         <div className="conversation-area flex flex-grow flex-col absolute top-0 pt-23 pb-16 h-full w-full">
           <div className="message-box h-full flex-grow flex overflow-y-auto scroll-smooth flex-col-reverse px-4 py-4 gap-4">
+            {waitingForResponse && (
+              <div className="max-w-100 bg-[#054640] text-[#ece5dd] px-3 py-2 rounded-lg">
+                <small className="opacity-70">AI</small>
+                <p className="text-base mt-2">
+                  <GridLoader color="#ece5dd" size={6} />
+                </p>
+              </div>
+            )}
             {messages.map((message, index) => {
               return (
                 <div
@@ -412,6 +450,7 @@ const Project = () => {
                         },
                       };
                       setFileTree(ft);
+                      saveFileTree(ft);
                     }}
                     dangerouslySetInnerHTML={{
                       __html: hljs.highlight(

@@ -62,3 +62,18 @@ export const getProjectById = async ({ projectId }) => {
   const project = await Project.findById(projectId);
   return project;
 };
+
+export const updateFileTree = async ({ projectId, fileTree }) => {
+  if (!projectId) throw new Error("Project id is required");
+  const project = await Project.findOneAndUpdate(
+    {
+      _id: projectId,
+    },
+    {
+      fileTree,
+    },
+    { new: true }
+  );
+
+  return project;
+};

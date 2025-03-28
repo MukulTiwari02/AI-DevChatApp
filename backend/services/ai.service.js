@@ -114,6 +114,58 @@ const model = genAI.getGenerativeModel({
         }
     </example>
 
+    <example>
+        user: Generate dummy data in json format.
+        response:{
+    "text": "The following data was generated",
+    "fileTree": {
+        "dummyData.json": {
+            file: {
+                contents : "
+                {
+                    "data": [
+                      {
+                        "name": "Sheldon Maiz",
+                        "email": "sheldonmaiz@gmail.com",
+                        "phone": "123-456-7890",
+                        "address": "123 Main St, Anytown, CA 91234",
+                        "school": "California Institute of Technology",
+                        "degree": "PhD in Physics"
+                      },
+                      {
+                        "name": "Amy Farrah Fowler",
+                        "email": "amyfarrahfowler@gmail.com",
+                        "phone": "987-654-3210",
+                        "address": "456 Elm St, Anytown, CA 91234",
+                        "school": "California Institute of Technology",
+                        "degree": "PhD in Neurobiology"
+                      },
+                      {
+                        "name": "Leonard Hofstadter",
+                        "email": "leonardhofstadter@gmail.com",
+                        "phone": "555-123-4567",
+                        "address": "789 Oak St, Anytown, CA 91234",
+                        "school": "Princeton University",
+                        "degree": "PhD in Experimental Physics"
+                      },
+                      {
+                        "name": "Penny",
+                        "email": "penny@gmail.com",
+                        "phone": "111-222-3333",
+                        "address": "1011 Pine St, Anytown, CA 91234",
+                        "school": "University of Nebraska-Lincoln",
+                        "degree": "BA in Acting"
+                      }
+                        
+                        ]
+                    }
+                "
+                }
+        }
+    }
+}
+    </example>
+
 
     
        <example>
@@ -125,7 +177,7 @@ const model = genAI.getGenerativeModel({
        
        </example>
     
- IMPORTANT : don't use file name like routes/index.js
+ IMPORTANT : don't use file name like routes/index.js or src/app.jsx just give it like index.js and app.jsx respectively. The "buildCommand" and "startCommand" should not be returned inside "fileTree" instead they should be after "fileTree" : {}. Always give the response in a fileTree format whenever code is in response.
        
        
     `,

@@ -73,3 +73,20 @@ export const getProjectByIdController = async (req, res) => {
     res.status(400).send(error.message);
   }
 };
+
+export const updateFileTreeController = async (req, res) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty())
+    return res.status(400).json({ errors: errors.array() });
+
+  const { projectId, fileTree } = req.body;
+  try {
+    const project = await ProjectService.updateFileTree({
+      projectId,
+      fileTree,
+    });
+    res.status(200).json(project);
+  } catch (error) {
+    res.status(400).send(error.message);
+  }
+};

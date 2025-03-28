@@ -18,4 +18,6 @@ router.put('/addUser', authUser, projectController.addUserToProjectController);
 
 router.get("/getProject/:projectId", projectController.getProjectByIdController);
 
+router.put('/update-fileTree', authUser, projectController.updateFileTreeController);
+
 export default router;
