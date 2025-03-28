@@ -1,4 +1,4 @@
-import { GoogleGenerativeAI } from "@google/generative-ai";
+import { ChatSession, GoogleGenerativeAI } from "@google/generative-ai";
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 const model = genAI.getGenerativeModel({
@@ -177,14 +177,16 @@ const model = genAI.getGenerativeModel({
        
        </example>
     
- IMPORTANT : don't use file name like routes/index.js or src/app.jsx just give it like index.js and app.jsx respectively. The "buildCommand" and "startCommand" should not be returned inside "fileTree" instead they should be after "fileTree" : {}. Always give the response in a fileTree format whenever code is in response.
+ IMPORTANT : don't use file name like routes/index.js or src/app.jsx just give it like index.js and app.jsx respectively. The "buildCommand" and "startCommand" should not be returned inside "fileTree" instead they should be after "fileTree" : {}. Always give the response in a fileTree format whenever code is in response. When having a general conversation, you should not include any fileTree in the response.
        
        
     `,
 });
 
+const chat_session = model.startChat({ history: [] });
+
 export const generateResult = async (prompt) => {
-  const result = await model.generateContent(prompt);
+  const result = await chat_session.sendMessage(prompt);
 
   return result.response.text();
 };

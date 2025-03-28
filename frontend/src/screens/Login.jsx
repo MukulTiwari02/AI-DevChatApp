@@ -1,7 +1,8 @@
 import React, { useState, useContext } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import axios from "../config/axios";
-import { UserContext } from '../context/user.context.jsx'
+import { UserContext } from "../context/user.context.jsx";
+import { toast } from "react-toastify";
 
 const Login = () => {
   const [email, setEmail] = useState("");
@@ -20,18 +21,18 @@ const Login = () => {
         password,
       })
       .then((res) => {
-        console.log(res.data);
-
         localStorage.setItem("token", res.data.token);
-        document.cookie = `jwt=${res.data.token}`
-        
+        document.cookie = `jwt=${res.data.token}`;
+
         setUser(res.data.user);
 
         navigate("/");
         navigate(0);
+        toast.success("Login successful!");
       })
       .catch((err) => {
         console.log(err.response.data);
+        toast.error(err.response.data.errors);
       });
   }
 

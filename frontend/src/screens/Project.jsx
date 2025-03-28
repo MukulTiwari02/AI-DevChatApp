@@ -64,7 +64,7 @@ const Project = () => {
         setWaitingForResponse(false);
         try {
           const message = JSON.parse(data.message);
-          if (message.fileTree) {
+          if (message.fileTree && Object.keys(message.fileTree).length > 0) {
             setFileTree(message.fileTree);
             saveFileTree(message.fileTree);
             setOpenFiles([]);
@@ -195,6 +195,7 @@ const Project = () => {
   };
 
   const saveFileTree = async (ft) => {
+    if(!ft || Object.keys(ft).length === 0) return;
     try {
       const updatedProject = await axios.put("/project/update-fileTree", {
         projectId: params.id,

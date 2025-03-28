@@ -28,10 +28,9 @@ export const loginController = async (req, res) => {
     return res.status(400).json({ errors: errors.array() });
   }
 
-  const { email, password } = req.body;
-  if (!email || !password) throw new Error("Email and password are required");
-
   try {
+    const { email, password } = req.body;
+    if (!email || !password) throw new Error("Email and password are required");
     const user = await User.findOne({ email }).select("+password");
 
     if (!user) {
@@ -68,7 +67,7 @@ export const loginController = async (req, res) => {
 
 export const profileController = async (req, res) => {
   let user = req.user;
-  user = await User.findOne({email: user.email})
+  user = await User.findOne({ email: user.email });
   res.status(200).json({ user: user });
 };
 
@@ -122,10 +121,10 @@ export const getUserById = async (req, res) => {
   }
 
   try {
-    const {userId} = req.params;
+    const { userId } = req.params;
     const user = await User.findById(userId);
 
-    if(!user) throw new Error("User not found")
+    if (!user) throw new Error("User not found");
     delete user._doc.password;
 
     res.status(200).json({ user: user });

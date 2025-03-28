@@ -2,6 +2,7 @@ import React, { useState, useContext } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import axios from "../config/axios";
 import { UserContext } from "../context/user.context";
+import {toast} from "react-toastify";
 
 const Register = () => {
   const [email, setEmail] = useState("");
@@ -31,7 +32,7 @@ const Register = () => {
         navigate(0);
       })
       .catch((err) => {
-        console.log(err.response.data);
+        toast.error("Some error occurred. Please try again.");
       });
   }
 
