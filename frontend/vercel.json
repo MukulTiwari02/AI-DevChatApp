@@ -1,9 +1,27 @@
 {
-    "routes": [
-      {
-        "src": "/.*",
-        "dest": "/index.html",
-        "status": 200
+  "routes": [
+    {
+      "src": "/assets/(.*.js)",
+      "headers": {
+        "Content-Type": "application/javascript"
       }
-    ]
-  }
+    },
+    {
+      "src": "/assets/(.*.css)",
+      "headers": {
+        "Content-Type": "text/css"
+      }
+    },
+    {
+      "src": "/assets/(.*.(png|jpg|svg|woff2|ttf))",
+      "headers": {
+        "Content-Type": "image/*, font/*"
+      }
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/index.html",
+      "status": 200
+    }
+  ]
+}
