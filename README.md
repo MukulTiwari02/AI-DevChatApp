@@ -96,7 +96,7 @@ Developers can communicate with project collaborators using real-time messaging 
 Using the @ai keyword, developers can generate AI-powered code suggestions and file structures.
 ![Alt text](demo/images/codeEditor.png)
 
-![Alt text](demo/images/UseAiToCode.png)
+![Alt text](demo/images/UseAIToCode.png)
 
 ### **6. Live Code Collaboration**
 ![Alt text](demo/images/LiveCodeEditing.png)
@@ -106,7 +106,7 @@ Using the @ai keyword, developers can generate AI-powered code suggestions and f
 
 ## 📜 Tech Stack
 
-- **Frontend**: React (Vite), TailwindCSS, React Router, WebContainers API
+- **Frontend**: React (Vite), TailwindCSS, React Router
 - **Backend**: Node.js, Express.js, MongoDB, Mongoose
 - **Real-Time**: Socket.io
 - **AI Integration**: Google Generative AI API
