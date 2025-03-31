@@ -49,9 +49,9 @@ npm start
 ```
 
 ### **3. Setup Frontend**
-
+Note: Run frontend in a new/separate terminal
 ```sh
-cd ../frontend
+cd frontend
 npm install
 ```
 
