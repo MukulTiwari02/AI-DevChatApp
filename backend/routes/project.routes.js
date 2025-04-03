@@ -16,6 +16,8 @@ router.get("/allProjects", authUser, projectController.getAllProjectsController)
 
 router.put('/addUser', authUser, projectController.addUserToProjectController);
 
+router.put('/removeUser', authUser, projectController.removeUserFromProjectController);
+
 router.get("/getProject/:projectId", projectController.getProjectByIdController);
 
 router.put('/update-fileTree', authUser, projectController.updateFileTreeController);

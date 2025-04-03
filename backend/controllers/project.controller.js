@@ -90,3 +90,20 @@ export const updateFileTreeController = async (req, res) => {
     res.status(400).send(error.message);
   }
 };
+
+export const removeUserFromProjectController = async (req, res) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty())
+    return res.status(400).json({ errors: errors.array() });
+
+  try {
+    const { projectId, userId } = req.body;
+    const project = await ProjectService.removeUserFromProject({
+      projectId,
+      userId,
+    });
+    res.status(200).json(project);
+  } catch (error) {
+    res.status(400).send(error.message);
+  }
+};

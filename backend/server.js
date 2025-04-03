@@ -39,7 +39,7 @@ io.use(async (socket, next) => {
 });
 
 io.on("connection", (socket) => {
-  socket.roomId = socket.project._id.toString();
+  socket.roomId = socket?.project?._id.toString();
 
   socket.join(socket.roomId);
 

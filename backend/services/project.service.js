@@ -57,6 +57,30 @@ export const addUserToProject = async ({ projectId, users, userId }) => {
   return updatedProject;
 };
 
+export const removeUserFromProject = async ({ projectId, userId }) => {
+  if (!projectId) throw new Error("Project id is required");
+  if (!userId) throw new Error("User id is required");
+
+  const project = await Project.findOne({ _id: projectId, users: userId });
+  if (!project) throw new Error("User does not belong to this project.");
+
+  let updatedProject = await Project.findOneAndUpdate(
+    {
+      _id: projectId,
+    },
+    {
+      $pull: {
+        users: userId,
+      },
+    },
+    { new: true }
+  );
+  if(updatedProject.users.length === 0)
+    updatedProject = await Project.findByIdAndDelete(projectId);
+
+  return updatedProject;
+};
+
 export const getProjectById = async ({ projectId }) => {
   if (!projectId) throw new Error("Project id is required");
   const project = await Project.findById(projectId);

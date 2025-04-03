@@ -75,25 +75,33 @@ Once both backend and frontend are running, open [http://localhost:5173](http://
 
 [**Live Demo Link**](https://ai-dev-chat.vercel.app/)
 
-### **1. User Authentication**
+### **1. Home**
+Cool landing page with interactive particle effect in background.
+
+![Alt text](demo/images/LandingPage.png)
+
+
+### **2. User Authentication**
 Users can register and log in to access the application securely.
 
 ![Alt text](demo/images/Login.png)
 
-### **2. Project Management**
+### **3. Project Management**
 Users can create projects, and add collaborators to work together.
 
 ![Alt text](demo/images/Home.png) 
 
-![Alt text](demo/images/Collab.png)
+![Alt text](demo/images/AddProject.png) 
 
 
-### **3. Real-Time Chat**
+### **4. Real-Time Chat**
 Developers can communicate with project collaborators using real-time messaging powered by Socket.io.
+
 ![Alt text](demo/images/Chat.png)
 
-### **4. AI-Assisted Coding**
+### **5. AI-Assisted Coding**
 Using the @ai keyword, developers can generate AI-powered code suggestions and file structures.
+
 ![Alt text](demo/images/codeEditor.png)
 
 ![Alt text](demo/images/UseAIToCode.png)

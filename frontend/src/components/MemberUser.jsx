@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from "react";
-import axios from '../config/axios'
+import axios from "../config/axios";
+import { IoExitOutline } from "react-icons/io5";
 
-const MemberUser = ({ userId }) => {
+const MemberUser = ({ userId, isCurrentUser, removeUserFromProject }) => {
   const [user, setUser] = useState(null);
 
   useEffect(() => {
@@ -15,9 +16,9 @@ const MemberUser = ({ userId }) => {
     }
 
     fetchUser();
-  },[]);
+  }, []);
 
-  return (user ? 
+  return user ? (
     <div className="user flex gap-2 items-center px-4">
       <svg
         xmlns="http://www.w3.org/2000/svg"
@@ -32,7 +33,18 @@ const MemberUser = ({ userId }) => {
         />
       </svg>
       <p className="font-semibold text-xl">{user?.email}</p>
-    </div> : <></>
+      {isCurrentUser && (
+        <button
+          className="ml-auto h-8 w-8 cursor-pointer"
+          onClick={() => removeUserFromProject()}
+          title="Leave Project"
+        >
+          <IoExitOutline size={30} />
+        </button>
+      )}
+    </div>
+  ) : (
+    <></>
   );
 };
 

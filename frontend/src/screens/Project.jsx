@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useState } from "react";
-import { useParams } from "react-router";
+import { useNavigate, useParams } from "react-router";
 import axios from "../config/axios";
 import CollaborationUser from "../components/CollaborationUser.jsx";
 import FileTreeElement from "../components/FileTreeElement.jsx";
@@ -9,6 +9,7 @@ import { UserContext } from "../context/user.context.jsx";
 import Markdown from "markdown-to-jsx";
 import hljs from "highlight.js";
 import GridLoader from "react-spinners/GridLoader";
+import { toast } from "react-toastify";
 
 function SyntaxHighlightedCode(props) {
   const ref = React.useRef(null);
@@ -38,6 +39,7 @@ const Project = () => {
   const [currentFile, setCurrentFile] = useState(null);
   const [openFiles, setOpenFiles] = useState([]);
   const [waitingForResponse, setWaitingForResponse] = useState(false);
+  const navigate = useNavigate();
 
   const params = useParams();
 
@@ -50,6 +52,8 @@ const Project = () => {
           setUser(response.data.user);
         } catch (error) {
           console.log(error);
+          toast.error("Unauthorized, Please Login");
+          navigate("/login");
         }
       }
       getUser();
@@ -82,8 +86,13 @@ const Project = () => {
     axios
       .get(`/project/getProject/${params.id}`)
       .then((res) => {
+        if (!res.data) {
+          toast.error("Project does not exist.");
+          navigate("/dashboard");
+          return;
+        }
         setProject(res.data);
-        if(!res.data.fileTree) setFileTree({});
+        if (!res.data.fileTree) setFileTree({});
         else setFileTree(res.data.fileTree);
       })
       .catch((err) => console.error(err));
@@ -138,12 +147,26 @@ const Project = () => {
     try {
       const response = await axios.get("/users/getAllUsers");
       const users = response.data;
-      const usersNotInProject = users.filter(
+      let usersNotInProject = users.filter(
         (user) => !project.users.includes(user._id)
       );
       setAllUsers(usersNotInProject);
     } catch (error) {
       console.error(error);
+    }
+  };
+
+  const removeUserFromProject = async () => {
+    try {
+      await axios.put(`/project/removeUser`, {
+        projectId: params.id,
+        userId: user._id,
+      });
+      toast.success("Exited project " + project.name.toUpperCase());
+      navigate("/dashboard");
+    } catch (error) {
+      console.error(error);
+      toast.error("Failed to exit from project");
     }
   };
 
@@ -195,7 +218,7 @@ const Project = () => {
   };
 
   const saveFileTree = async (ft) => {
-    if(!ft || Object.keys(ft).length === 0) return;
+    if (!ft || Object.keys(ft).length === 0) return;
     try {
       const updatedProject = await axios.put("/project/update-fileTree", {
         projectId: params.id,
@@ -212,7 +235,7 @@ const Project = () => {
       <section className="left h-full flex-col flex min-w-100 w-[30%] bg-[#075e54] relative">
         <header className="flex justify-between items-center p-4 w-full bg-[#128c7e] shadow-xl top-0 absolute z-10">
           <h1 className="text-[#ece5dd] text-2xl">
-            {project?.name[0].toUpperCase() + project?.name.substring(1)}
+            {project?.name.toUpperCase()}
           </h1>
           <button
             onClick={toggleSidePanel}
@@ -359,9 +382,19 @@ const Project = () => {
           </header>
           <div className="users flex-grow overflow-y-scroll scroll-smooth flex flex-col gap-2 pt-4 bg-[#c4c1c1]">
             {project?.users.length > 0 &&
-              project.users.map((userId) => (
-                <MemberUser key={userId} userId={userId} />
-              ))}
+              [...project.users]
+                .sort((a, b) => (a === user?._id ? -1 : b === user?._id ? 1 : 0))
+                .map((userId) => {
+                  let isCurrentUser = userId === user._id;
+                  return (
+                    <MemberUser
+                      key={userId}
+                      userId={userId}
+                      isCurrentUser={isCurrentUser}
+                      removeUserFromProject={removeUserFromProject}
+                    />
+                  );
+                })}
           </div>
         </div>
       </section>
