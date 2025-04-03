@@ -24,7 +24,9 @@ const Dashboard = () => {
       setIsModalOpen(false);
       setProjectName("");
       setProjectAdded((e) => e + 1);
+      toast.success("Project Created Sucessfully.");
     } catch (error) {
+      toast.error("Some error occured.");
       console.log(error);
     }
   }
@@ -126,25 +128,26 @@ const Dashboard = () => {
       </div>
 
       <div className="space-y-4">
-        {projects
-          .filter((project) =>
-            project.name.toLowerCase().includes(searchTerm.toLowerCase())
-          )
-          .map((project) => (
-            <motion.div
-              key={project._id}
-              onClick={() => navigate(`/project/${project._id}`)}
-              whileHover={{ backgroundColor: "#054640" }}
-              className="p-5 bg-[#003b30] rounded-md cursor-pointer"
-            >
-              <h3 className="text-lg font-bold text-[#ece5dd]">
-                {project.name.toUpperCase()}
-              </h3>
-              <p className="text-gray-400 text-sm">
-                Collaborators: {project.users.length}
-              </p>
-            </motion.div>
-          ))}
+        {projects.length > 0 &&
+          projects
+            .filter((project) =>
+              project.name.toLowerCase().includes(searchTerm.toLowerCase())
+            )
+            .map((project) => (
+              <motion.div
+                key={project._id}
+                onClick={() => navigate(`/project/${project._id}`)}
+                whileHover={{ backgroundColor: "#054640" }}
+                className="p-5 bg-[#003b30] rounded-md cursor-pointer"
+              >
+                <h3 className="text-lg font-bold text-[#ece5dd]">
+                  {project.name.toUpperCase()}
+                </h3>
+                <p className="text-gray-400 text-sm">
+                  Collaborators: {project.users.length}
+                </p>
+              </motion.div>
+            ))}
       </div>
       <AnimatePresence>
         {isModalOpen && (

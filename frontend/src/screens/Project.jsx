@@ -385,7 +385,7 @@ const Project = () => {
               [...project.users]
                 .sort((a, b) => (a === user?._id ? -1 : b === user?._id ? 1 : 0))
                 .map((userId) => {
-                  let isCurrentUser = userId === user._id;
+                  let isCurrentUser = userId === user?._id;
                   return (
                     <MemberUser
                       key={userId}
