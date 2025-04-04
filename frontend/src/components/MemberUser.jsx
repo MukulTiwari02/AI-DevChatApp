@@ -3,6 +3,7 @@ import axios from "../config/axios";
 import { IoExitOutline } from "react-icons/io5";
 
 const MemberUser = ({ userId, isCurrentUser, removeUserFromProject }) => {
+  const innerWidth = window.innerWidth;
   const [user, setUser] = useState(null);
 
   useEffect(() => {
@@ -24,7 +25,7 @@ const MemberUser = ({ userId, isCurrentUser, removeUserFromProject }) => {
         xmlns="http://www.w3.org/2000/svg"
         viewBox="0 0 24 24"
         fill="#06625f"
-        className="size-15"
+        className="size-13 sm:size-15"
       >
         <path
           fillRule="evenodd"
@@ -32,14 +33,14 @@ const MemberUser = ({ userId, isCurrentUser, removeUserFromProject }) => {
           clipRule="evenodd"
         />
       </svg>
-      <p className="font-semibold text-xl">{user?.email}</p>
+      <p className="font-semibold text-lg sm:text-xl">{user?.email}</p>
       {isCurrentUser && (
         <button
-          className="ml-auto h-8 w-8 cursor-pointer"
+          className="ml-auto sm:h-8 sm:w-8 cursor-pointer active:scale-95"
           onClick={() => removeUserFromProject()}
           title="Leave Project"
         >
-          <IoExitOutline size={30} />
+          <IoExitOutline size={innerWidth > 600? 30 : 20} />
         </button>
       )}
     </div>

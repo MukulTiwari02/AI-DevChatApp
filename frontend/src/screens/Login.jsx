@@ -43,7 +43,7 @@ const Login = () => {
         initial={{ opacity: 0, scale: 0.8 }}
         animate={{ opacity: 1, scale: 1 }}
         transition={{ duration: 0.5 }}
-        className="bg-[#054640] p-8 rounded-lg shadow-lg w-full max-w-md"
+        className="bg-[#054640] p-8 rounded-lg shadow-lg w-xs sm:w-full max-w-md"
       >
         <h2 className="text-2xl font-bold text-white mb-6">Login</h2>
         <form onSubmit={submitHandler}>

@@ -10,6 +10,9 @@ import axios from "../config/axios.js";
 
 const LandingPage = () => {
   const navigate = useNavigate();
+  const innerWidth = window.innerWidth;
+  const particles = innerWidth > 640 ? 250 : 150;
+  console.log(innerWidth);
   const { user, setUser } = useContext(UserContext);
 
   const particlesInit = async (main) => {
@@ -36,7 +39,7 @@ const LandingPage = () => {
   };
 
   return (
-    <div className="select-none relative bg-[#075E54] text-white min-h-screen flex flex-col items-center justify-center px-6 overflow-hidden">
+    <div className="select-none relative bg-[#075E54] text-white min-h-screen flex flex-col items-center justify-center px-6 pt-3 overflow-hidden">
       <Particles
         id="tsparticles"
         init={particlesInit}
@@ -46,7 +49,7 @@ const LandingPage = () => {
           },
           particles: {
             number: {
-              value: 250,
+              value: particles,
             },
             size: {
               value: 2,
@@ -84,14 +87,15 @@ const LandingPage = () => {
         className="absolute inset-0"
       />
 
-      <img
-        src={logo}
-        alt="Logo"
-        className="absolute top-3 left-3 w-38 h-38 z-10"
-      />
-
+      <div className="w-full sm:h-38 h-20 flex items-center">
+        <img
+          src={logo}
+          alt="Logo"
+          className="sm:w-38 sm:h-38 z-10 h-30 w-30 -ml-8"
+        />
+      </div>
       <motion.h1
-        className="text-5xl font-extrabold text-[#25D366] mb-4 relative z-10"
+        className="text-4xl sm:text-5xl mx-auto text-center font-extrabold text-[#25D366] mb-4 relative z-10"
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.8 }}
@@ -100,7 +104,7 @@ const LandingPage = () => {
       </motion.h1>
 
       <motion.p
-        className="text-lg text-[#faf6f2] mb-6 max-w-lg text-center relative z-10"
+        className="text-md sm:text-lg text-[#faf6f2] mb-6 max-w-lg text-center relative z-10"
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 1 }}
@@ -112,47 +116,47 @@ const LandingPage = () => {
       <motion.button
         onClick={navigateUserToDashboard}
         whileTap={{ scale: 0.95 }}
-        className="bg-[#25D366] hover:bg-[#dcf8c6] hover:scale-105 text-black px-6 py-3 rounded-2xl text-lg shadow-md transition-all mb-8 relative z-10"
+        className="bg-[#25D366] hover:bg-[#dcf8c6] hover:scale-105 text-black px-4 py-2 sm:px-6 sm:py-3 rounded-xl text-md sm:text-lg shadow-md transition-all mb-8 relative z-10"
       >
         Get Started
       </motion.button>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 text-center max-w-4xl relative z-10">
+      <div className="md:grid flex flex-col md:h-fit justify-center md:grid-cols-3 gap-6 text-center  max-w-xs sm:max-w-4xl relative z-10 ">
         <motion.div
-          className="p-6 bg-[#005d4b] rounded-xl shadow-md"
+          className="p-6 bg-[#005d4b] flex-1 rounded-xl shadow-md"
           whileHover={{ scale: 1.05 }}
         >
-          <FaCode className="text-[#25D366] text-4xl mb-3 mx-auto" />
-          <h3 className="text-xl font-bold">AI-Assisted Coding</h3>
+          <FaCode className="text-[#25D366] text-3xl sm:text-4xl mb-2 sm:mb-3 mx-auto" />
+          <h3 className="text-md sm:text-xl font-bold">AI-Assisted Coding</h3>
           <p className="text-white/60 text-sm">
             Boost efficiency with AI-powered coding assistance.
           </p>
         </motion.div>
 
         <motion.div
-          className="p-6 bg-[#005d4b] rounded-xl shadow-md"
+          className="p-6 bg-[#005d4b] flex-1 rounded-xl shadow-md"
           whileHover={{ scale: 1.05 }}
         >
-          <FaComments className="text-[#25D366] text-4xl mb-3 mx-auto" />
-          <h3 className="text-xl font-bold">Real-Time Collaboration</h3>
+          <FaComments className="text-[#25D366] text-3xl sm:text-4xl mb-2 sm:mb-3 mx-auto" />
+          <h3 className="text-md sm:text-xl font-bold">Real-Time Collaboration</h3>
           <p className="text-white/60 text-sm">
             Work together with instant communication.
           </p>
         </motion.div>
 
         <motion.div
-          className="p-6 bg-[#005d4b] rounded-xl shadow-md"
+          className="p-6 bg-[#005d4b] flex-1 rounded-xl shadow-md"
           whileHover={{ scale: 1.05 }}
         >
-          <FaLightbulb className="text-[#25D366] text-4xl mb-3 mx-auto" />
-          <h3 className="text-xl font-bold">Intelligent Suggestions</h3>
+          <FaLightbulb className="text-[#25D366] text-3xl sm:text-4xl mb-2 sm:mb-3 mx-auto" />
+          <h3 className="text-md sm:text-xl font-bold">Intelligent Suggestions</h3>
           <p className="text-white/60 text-sm">
             Receive smart recommendations to enhance productivity.
           </p>
         </motion.div>
       </div>
 
-      <footer className="mt-12 absolute bottom-0 text-[#ece5dd] text-sm pb-2 z-10">
+      <footer className="sm:mt-auto mt-12 text-[#ece5dd] text-sm pb-2 z-10">
         &copy; 2025 AI Developer Chat. All rights reserved.
       </footer>
     </div>

@@ -231,10 +231,10 @@ const Project = () => {
   };
 
   return (
-    <main className="h-screen w-screen flex">
-      <section className="left h-full flex-col flex min-w-100 w-[30%] bg-[#075e54] relative">
-        <header className="flex justify-between items-center p-4 w-full bg-[#128c7e] shadow-xl top-0 absolute z-10">
-          <h1 className="text-[#ece5dd] text-2xl">
+    <main className="h-screen w-screen flex sm:overflow-y-hidden">
+      <section className="left h-full flex-col flex w-full sm:min-w-100 sm:w-[30%] bg-[#075e54] relative">
+        <header className="flex justify-between items-center p-3 sm:p-4 w-full bg-[#128c7e] shadow-xl top-0 absolute z-10">
+          <h1 className="text-[#ece5dd] text-xl sm:text-2xl">
             {project?.name.toUpperCase()}
           </h1>
           <button
@@ -247,7 +247,7 @@ const Project = () => {
               viewBox="0 0 24 24"
               strokeWidth={1.5}
               stroke="currentColor"
-              className="size-9"
+              className="sm:size-9 size-6"
             >
               <path
                 strokeLinecap="round"
@@ -275,7 +275,7 @@ const Project = () => {
                   className={
                     message.type === "incoming"
                       ? message.sender._id === "AI"
-                        ? "max-w-100 bg-[#054640] text-[#ece5dd] px-3 py-2 rounded-lg"
+                        ? "max-w-80 sm:max-w-100 bg-[#054640] text-[#ece5dd] px-3 py-2 rounded-lg"
                         : "max-w-80 flex flex-col w-fit text-wrap break-words bg-[#c4c1c1] px-3 py-2 rounded-lg"
                       : "max-w-80 flex flex-col w-fit text-wrap break-words bg-[#dcf8c6] px-3 py-2 rounded-lg ml-auto"
                   }
@@ -335,8 +335,8 @@ const Project = () => {
             (!isSidePanelOpen ? "left-[-100%]" : "left-0")
           }
         >
-          <header className="flex gap-4 items-center p-4 w-full bg-[#128c7e] shadow-sm shadow-gray-500 z-5">
-            <h1 className="text-[#ece5dd] text-2xl">Project Members</h1>
+          <header className="flex gap-4 items-center p-3 sm:p-4 w-full bg-[#128c7e] shadow-sm shadow-gray-500 z-5">
+            <h1 className="text-[#ece5dd] text-xl sm:text-2xl">Project Members</h1>
             <button
               title="Add Collaborator"
               onClick={() => {
@@ -351,7 +351,7 @@ const Project = () => {
                 viewBox="0 0 24 24"
                 strokeWidth={1.5}
                 stroke="currentColor"
-                className="size-6  translate-x-[1.5px]"
+                className="size-4 sm:size-6 translate-x-[1.5px]"
               >
                 <path
                   strokeLinecap="round"
@@ -362,7 +362,7 @@ const Project = () => {
             </button>
             <button
               onClick={toggleSidePanel}
-              className="ml-auto cursor-pointer active:scale-95 transition-all h-15 w-15 bg-[#ece5dd] rounded-full flex items-center justify-center"
+              className="ml-auto cursor-pointer active:scale-95 transition-all p-3 bg-[#ece5dd] rounded-full flex items-center justify-center"
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -370,7 +370,7 @@ const Project = () => {
                 viewBox="0 0 24 24"
                 strokeWidth={1.5}
                 stroke="currentColor"
-                className="size-8"
+                className="size-6 sm:size-8"
               >
                 <path
                   strokeLinecap="round"
@@ -380,7 +380,7 @@ const Project = () => {
               </svg>
             </button>
           </header>
-          <div className="users flex-grow overflow-y-scroll scroll-smooth flex flex-col gap-2 pt-4 bg-[#c4c1c1]">
+          <div className="users flex-grow overflow-y-scroll scroll-smooth flex flex-col gp-1.5 sm:gap-2 pt-3 sm:pt-4 bg-[#c4c1c1]">
             {project?.users.length > 0 &&
               [...project.users]
                 .sort((a, b) => (a === user?._id ? -1 : b === user?._id ? 1 : 0))
@@ -399,7 +399,7 @@ const Project = () => {
         </div>
       </section>
 
-      <section className="right flex flex-grow h-full">
+      <section className="right sm:flex flex-grow h-full hidden">
         <div className="explorer h-full bg-[#054640] min-w-56 w-2/12">
           <div className="file-tree flex flex-col overflow-hidden">
             {Object.keys(fileTree).map((fileName) => {
@@ -523,11 +523,11 @@ const Project = () => {
               &#8203;
             </span>
 
-            <div className="inline-block align-bottom bg-neutral-300 rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-40 sm:align-middle sm:max-w-lg sm:w-full">
-              <div className="bg-neutral-300 px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+            <div className="inline-block align-bottom mx-auto bg-neutral-300 rounded-lg text-left overflow-hidden shadow-xl transform transition-all my-30 sm:my-40 sm:align-middle w-xs sm:max-w-lg sm:w-full">
+              <div className="bg-neutral-300 px-5 sm:px-4 pt-3 sm:pt-5 pb-2 sm:p-6 sm:pb-4">
                 <div className="sm:flex sm:items-start">
-                  <div className="mt-3 text-center sm:mt-0 sm:text-left">
-                    <h3 className="text-lg leading-6 font-medium text-gray-900">
+                  <div className="mt-3 sm:mt-0 text-left">
+                    <h3 className="text-md sm:text-lg leading-6 font-medium text-gray-900">
                       Add Collaborators to this project
                     </h3>
                   </div>

@@ -23,12 +23,12 @@ const CollaborationUser = ({user, selectedUsers, setSelectedUsers}) => {
   return (
     <div 
       onClick={toggleCurrentUserSelection}
-    className={"user select-none cursor-pointer p-3 px-6 flex gap-2 items-center " + (isSelected ? "bg-[#25d366] hover:bg-[#b16363a8]" : " hover:bg-gray-400") }>
+    className={"user select-none cursor-pointer p-2 px-4 sm:p-3 sm:px-5 flex gap-2 items-center " + (isSelected ? "bg-[#25d366] hover:bg-[#b16363a8]" : " hover:bg-gray-400") }>
       <svg
         xmlns="http://www.w3.org/2000/svg"
         viewBox="0 0 24 24"
         fill="currentColor"
-        className="size-10"
+        className="size-8 sm:size-10"
       >
         <path
           fillRule="evenodd"
@@ -36,7 +36,7 @@ const CollaborationUser = ({user, selectedUsers, setSelectedUsers}) => {
           clipRule="evenodd"
         />
       </svg>
-      <p className="font-semibold text-md">
+      <p className="font-semibold text-sm sm:text-md">
         {user.email}
       </p>
     </div>

@@ -71,14 +71,14 @@ const Dashboard = () => {
   };
 
   return (
-    <main className="select-none p-10 min-h-screen bg-[#041f1c] text-[#faf6f2] relative">
-      <div className="flex justify-between items-center mb-6 h-20">
+    <main className="select-none px-5 py-3 sm:py-5 sm:px-10 min-h-screen bg-[#041f1c] text-[#faf6f2] relative">
+      <div className="flex justify-between items-center sm:mb-6 h-20">
         <div
-          className="h-full w-fit cursor-pointer flex items-center"
+          className="h-full w-fit cursor-pointer flex items-center -translate-x-2 sm:translate-x-0"
           onClick={() => navigate("/")}
         >
-          <img src={logo} alt="Logo" className="h-full object-fill scale-175" />
-          <span className="text-3xl font-bold text-[#25D366]">
+          <img src={logo} alt="Logo" className="h-15 object-fill scale-175" />
+          <span className="text-xl sm:text-3xl -translate-y-1 font-bold text-[#25D366]">
             AI Developer Chat
           </span>
         </div>
@@ -86,7 +86,7 @@ const Dashboard = () => {
           <div className="relative">
             <button
               onClick={() => setShowProfileMenu(!showProfileMenu)}
-              className="w-10 h-10 rounded-full bg-[#005d4b] flex items-center justify-center text-white text-lg cursor-pointer"
+              className="sm:w-10 w-9 h-9 sm:h-10  rounded-full bg-[#005d4b] flex items-center justify-center text-white text-lg cursor-pointer"
             >
               {user.email[0].toUpperCase()}
             </button>
@@ -95,12 +95,12 @@ const Dashboard = () => {
                 initial={{ opacity: 0, y: -10 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -10 }}
-                className="absolute right-0 mt-2 min-w-48 max-w-fit bg-[#075e54] shadow-md rounded-md p-2"
+                className="absolute right-0 mt-2 w-fit sm:min-w-48 sm:max-w-fit bg-[#075e54] shadow-md rounded-md p-2"
               >
-                <p className="text-[#dcf8c6] px-3 py-2">{user?.email}</p>
+                <p className="text-[#dcf8c6] text-sm sm:text-md px-2 sm:px-3 py-1 sm:py-2">{user?.email}</p>
                 <button
                   onClick={logoutUser}
-                  className="cursor-pointer w-full text-left px-3 py-2 hover:bg-[#128c7e] rounded-md"
+                  className="cursor-pointer w-full text-sm sm:text-md text-left px-2 py-1 sm:px-3 sm:py-2 hover:bg-[#128c7e] rounded-md"
                 >
                   Logout
                 </button>
@@ -109,19 +109,19 @@ const Dashboard = () => {
           </div>
         )}
       </div>
-      <h2 className="text-4xl font-bold text-[#faf6f2] mb-6">My Projects</h2>
-      <div className="flex justify-between items-center mb-6">
+      <h2 className="text-2xl sm:text-4xl font-bold text-[#faf6f2] mb-4 sm:mb-6">My Projects</h2>
+      <div className="flex justify-between items-center mb-4 sm:mb-6">
         <input
           type="text"
           placeholder="Search projects . . ."
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
-          className="px-3 py-2 w-full max-w-lg rounded-md border border-[rgba(128,221,210,0.7)] text-[rgb(255,255,255)] placeholder:text-white/60 focus:outline-none focus:ring-0 focus:ring-[#25D366]"
+          className="px-3 py-2 sm:px-3 sm:py-2 sm:w-full w-3xs max-w-md sm:max-w-lg text-sm sm:text-md rounded-md border border-[rgba(128,221,210,0.7)] text-[rgb(255,255,255)] placeholder:text-white/60 focus:outline-none focus:ring-0 focus:ring-[#25D366]"
         />
         <motion.button
           onClick={() => setIsModalOpen(true)}
           whileHover={{ scale: 1.1 }}
-          className="ml-4 px-4 py-2 bg-[#25d366] rounded-md text-[#041f1c] font-semibold text-md active:scale-95"
+          className="ml-auto px-3 py-2 sm:px-4 sm:py-2 bg-[#25d366] rounded-md text-[#041f1c] font-semibold text-sm sm:text-md active:scale-95"
         >
           + New
         </motion.button>
@@ -138,12 +138,12 @@ const Dashboard = () => {
                 key={project._id}
                 onClick={() => navigate(`/project/${project._id}`)}
                 whileHover={{ backgroundColor: "#054640" }}
-                className="p-5 bg-[#003b30] rounded-md cursor-pointer"
+                className="p-3 sm:p-5 bg-[#003b30] rounded-md cursor-pointer"
               >
-                <h3 className="text-lg font-bold text-[#ece5dd]">
+                <h3 className="text-md sm:text-lg font-bold text-[#ece5dd]">
                   {project.name.toUpperCase()}
                 </h3>
-                <p className="text-gray-400 text-sm">
+                <p className="text-gray-400 text-[13px] sm:text-sm">
                   Collaborators: {project.users.length}
                 </p>
               </motion.div>
@@ -161,7 +161,7 @@ const Dashboard = () => {
               initial={{ scale: 0.8 }}
               animate={{ scale: 1 }}
               exit={{ scale: 0.8 }}
-              className="bg-[#162b29] p-6 rounded-md shadow-md w-96"
+              className="bg-[#162b29] p-6 rounded-md shadow-md w-xs sm:w-96"
             >
               <h3 className="text-lg font-bold text-white mb-4">
                 Add New Project
